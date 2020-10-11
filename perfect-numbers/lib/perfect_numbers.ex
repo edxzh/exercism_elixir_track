@@ -20,12 +20,13 @@ defmodule PerfectNumbers do
 
   defp find_aliquot_sum(number) do
     1..div(number, 2)
-    |> Enum.to_list()
-    |> Enum.filter(fn x -> rem(number, x) == 0 end)
+    |> Enum.reduce(fn x, acc ->
+      if rem(number, x) == 0, do: acc + x, else: acc
+    end)
   end
 
   defp classify(aliquot_sum, number) do
-    case Enum.sum(aliquot_sum) - number do
+    case aliquot_sum - number do
       result when result == 0 ->
         {:ok, :perfect}
       result when result < 0 ->
