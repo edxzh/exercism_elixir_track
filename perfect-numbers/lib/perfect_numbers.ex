@@ -13,19 +13,8 @@ defmodule PerfectNumbers do
   def classify(number) when number <= 0, do: {:error, "Classification is only possible for natural numbers."}
   def classify(number) when number == 1, do: {:ok, :deficient}
   def classify(number) do
-    aliquot_sum = find_aliquot_sum(number)
-    classify(aliquot_sum, number)
-  end
+    aliquot_sum = get_aliquot_sum(number, div(number, 2), 1)
 
-
-  defp find_aliquot_sum(number) do
-    1..div(number, 2)
-    |> Enum.reduce(fn x, acc ->
-      if rem(number, x) == 0, do: acc + x, else: acc
-    end)
-  end
-
-  defp classify(aliquot_sum, number) do
     case aliquot_sum - number do
       result when result == 0 ->
         {:ok, :perfect}
@@ -35,4 +24,10 @@ defmodule PerfectNumbers do
         {:ok, :abundant}
     end
   end
+
+  defp get_aliquot_sum(_number, 1, sum), do: sum
+  defp get_aliquot_sum(number, factor, sum) when rem(number, factor) == 0 do
+    get_aliquot_sum(number, factor-1, sum + factor)
+  end
+  defp get_aliquot_sum(number, factor, sum), do: get_aliquot_sum(number, factor-1, sum)
 end
