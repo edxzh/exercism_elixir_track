@@ -7,16 +7,33 @@ defmodule CryptoSquare do
     "ac bd"
   """
   @spec encode(String.t()) :: String.t()
+  def encode(""), do: ""
+
   def encode(str) do
-    str
-    |> String.replace(~r/[[:punct:] ]/, "")
-    |> String.length()
-    |> get_c_r()
+    normalized_str = normalize(str)
+
+    c = normalized_str
+        |> String.length()
+        |> get_c()
+
+    do_encode(normalized_str, c)
   end
 
-  defp get_c_r(number) do
-    squre_root = :math.sqrt(number) |> round()
+  defp do_encode(str, c) do
+    str
+    |> String.graphemes()
+    |> Enum.chunk_every(c, c, Stream.cycle([""]))
+    |> Enum.zip()
+    |> Enum.map_join(" ", &Tuple.to_list/1)
+  end
 
-    {squre_root, squre_root + 1}
+  defp normalize(str) do
+    str
+    |> String.downcase()
+    |> String.replace(~r/[[:punct:] ]/, "")
+  end
+
+  defp get_c(number) do
+    squre_root = :math.sqrt(number) |> ceil()
   end
 end
