@@ -28,6 +28,7 @@ defmodule Triplet do
   """
   @spec generate(non_neg_integer, non_neg_integer) :: [list(non_neg_integer)]
   def generate(min, max) do
+    for a <- min..max, b <- a..max, c <- b..max, pythagorean?(triplet = [a, b, c]), do: triplet
   end
 
   @doc """
@@ -35,5 +36,6 @@ defmodule Triplet do
   """
   @spec generate(non_neg_integer, non_neg_integer, non_neg_integer) :: [list(non_neg_integer)]
   def generate(min, max, sum) do
+    generate(min, max) |> Enum.filter(&(sum(&1) == sum))
   end
 end
