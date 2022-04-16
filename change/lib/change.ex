@@ -18,25 +18,21 @@ defmodule Change do
   @spec generate(list, integer) :: {:ok, list} | {:error, String.t()}
   def generate(_coins, target) when target < 0, do: {:error, "cannot change"}
   def generate(_coins, 0), do: {:ok, []}
-
   def generate(coins, target) do
     changes =
       1..target
       |> Enum.reduce(%{0 => []}, fn index, changes -> change_for(index, changes, coins) end)
-
     case Map.get(changes, target) do
       nil -> {:error, "cannot change"}
       change -> {:ok, change}
     end
   end
-
   def change_for(target, accumulator, coins) do
     change =
       coins
       |> Enum.filter(fn coin -> accumulator[target - coin] end)
       |> Enum.map(fn coin -> [coin | accumulator[target - coin]] end)
       |> Enum.min_by(&length/1, fn -> nil end)
-
     Map.put(accumulator, target, change)
   end
 end
