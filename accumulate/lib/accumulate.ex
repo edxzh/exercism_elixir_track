@@ -16,11 +16,13 @@ defmodule Accumulate do
   """
 
   @spec accumulate(list, (any -> any)) :: list
-  def accumulate(list, fun), do: accumulate(list, fun, []) |> reverse
-  defp accumulate([], _, acc), do: acc
-  defp accumulate([head | tail], fun, acc), do: accumulate(tail, fun, [fun.(head) | acc])
+  def accumulate(list, fun), do: accumulate(list, fun, [])
+  def accumulate([], _, acc), do: acc
+
+  def accumulate([head | rest], fun, acc),
+    do: accumulate(rest, fun, [fun.(head) | acc]) |> reverse()
 
   defp reverse(list), do: reverse(list, [])
   defp reverse([], acc), do: acc
-  defp reverse([head | tail], acc), do: reverse(tail, [head | acc])
+  defp reverse([head | rest], acc), do: reverse(rest, [head | acc])
 end

@@ -1,10 +1,3 @@
-if !System.get_env("EXERCISM_TEST_EXAMPLES") do
-  Code.load_file("accumulate.exs", __DIR__)
-end
-
-ExUnit.start()
-ExUnit.configure(exclude: :pending, trace: true)
-
 defmodule AccumulateTest do
   use ExUnit.Case
 
@@ -12,15 +5,18 @@ defmodule AccumulateTest do
     assert Accumulate.accumulate([], fn n -> n * n end) == []
   end
 
+  @tag :pending
   test "accumulate square numbers" do
     assert Accumulate.accumulate([1, 2, 3], fn n -> n * n end) == [1, 4, 9]
   end
 
+  @tag :pending
   test "accumulate upcased strings" do
     fun = fn w -> String.upcase(w) end
     assert Accumulate.accumulate(["hello", "world"], fun) == ["HELLO", "WORLD"]
   end
 
+  @tag :pending
   test "accumulate reversed strings" do
     fun = fn w -> String.reverse(w) end
     words = ~w(the quick brown fox etc)
@@ -28,6 +24,7 @@ defmodule AccumulateTest do
     assert Accumulate.accumulate(words, fun) == expected
   end
 
+  @tag :pending
   test "nested accumulate" do
     chars = ~w(a b c)
     nums = ~w(1 2 3)
