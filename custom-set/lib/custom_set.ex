@@ -1,53 +1,44 @@
 defmodule CustomSet do
+  defstruct map: []
   @opaque t :: %__MODULE__{map: map}
 
-  defstruct map: []
-
   @spec new(Enum.t()) :: t
-  def new(enumerable), do: %CustomSet{map: Enum.uniq(enumerable)}
+  def new(enumerable), do: %__MODULE__{map: Enum.uniq(enumerable) |> Enum.into([])}
 
   @spec empty?(t) :: boolean
   def empty?(%{map: []}), do: true
-  def empty?(_custom_set), do: false
+  def empty?(_), do: false
 
   @spec contains?(t, any) :: boolean
   def contains?(%{map: map}, element), do: Enum.member?(map, element)
 
   @spec subset?(t, t) :: boolean
-  def subset?(%{map: map_1}, %{map: map_2}),
-    do: Enum.all?(map_1, &Enum.member?(map_2, &1))
+  def subset?(%{map: map_a}, %{map: map_b}), do: Enum.all?(map_a, &Enum.member?(map_b, &1))
 
   @spec disjoint?(t, t) :: boolean
   def disjoint?(%{map: []}, _), do: true
   def disjoint?(_, %{map: []}), do: true
 
-  def disjoint?(%{map: map_1}, %{map: map_2}),
-    do: !Enum.any?(map_1, &Enum.member?(map_2, &1))
-
   @spec equal?(t, t) :: boolean
-  def equal?(%{map: map_1}, %{map: map_2}), do: :lists.sort(map_1) == :lists.sort(map_2)
+  def equal?(%{map: map_a}, %{map: map_b}), do: map_a == map_b
 
   @spec add(t, any) :: t
-
-  def add(%{map: map}, element), do: adding(map, element, [])
-  # end
-  defp adding([], element, before), do: %CustomSet{map: before ++ [element]}
-  # element is in
-  defp adding([check | _set] = map, element, before) when check == element,
-    do: %CustomSet{map: before ++ map}
-
-  # adding element
-  defp adding([check | _set] = map, element, before) when check > element,
-    do: %CustomSet{map: before ++ [element | map]}
-
-  defp adding([check | set], element, before), do: adding(set, element, before ++ [check])
+  def add(custom_set, element), do: new([element | custom_set.map])
 
   @spec intersection(t, t) :: t
-  def intersection(%{map: []}, _), do: %CustomSet{map: []}
-  def intersection(_, %{map: []}), do: %CustomSet{map: []}
+  def intersection(set, set), do: set
+  def intersection(%__MODULE__{map: []}, _), do: new([])
+  def intersection(_, %__MODULE__{map: []}), do: new([])
 
-  def intersection(%{map: map_1}, %{map: map_2}),
-    do: %CustomSet{map: Enum.filter(map_1, &Enum.member?(map_2, &1))}
+  def intersection(set_1, set_2) when length(set_1.map) < length(set_2.map),
+    do: intersection(set_2, set_1)
+
+  def intersection(set_1, set_2) when length(set_1.map) >= length(set_2.map) do
+    Enum.reduce(set_1.map, [], fn ele, acc ->
+      if contains?(set_2, ele), do: [ele | acc], else: acc
+    end)
+    |> new()
+  end
 
   @spec difference(t, t) :: t
   def difference(%{map: []}, _), do: %CustomSet{map: []}
